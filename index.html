@@ -500,13 +500,9 @@
       window.voiceflow.chat.load({
         verify: { projectID: agent.projectID },
         url: 'https://general-runtime.voiceflow.com',
-        versionID: 'production',
-        render: { mode: 'embedded', target: chatPanel },
-        autostart: true
+        voice: { url: 'https://runtime-api.voiceflow.com' },
+        render: { mode: 'embedded', target: chatPanel }
       });
-      if (window.voiceflow.chat.open){
-        try{ window.voiceflow.chat.open(); }catch(e){}
-      }
       setStatus(agent.name + ' is live', true);
     }, 60);
   }
