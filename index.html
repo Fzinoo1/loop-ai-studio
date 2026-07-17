@@ -417,7 +417,7 @@
     if (bundlePromise) return bundlePromise;
     bundlePromise = new Promise((resolve, reject) => {
       const script = document.createElement('script');
-      script.type = 'module';
+      script.type = 'text/javascript';
       script.src = VOICEFLOW_BUNDLE_URL;
       script.onload = () => resolve();
       script.onerror = () => reject(new Error('Failed to load Voiceflow bundle'));
@@ -504,6 +504,9 @@
         render: { mode: 'embedded', target: chatPanel },
         autostart: true
       });
+      if (window.voiceflow.chat.open){
+        try{ window.voiceflow.chat.open(); }catch(e){}
+      }
       setStatus(agent.name + ' is live', true);
     }, 60);
   }
