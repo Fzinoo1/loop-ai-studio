@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loop AI Studio — Live Agent Demos</title>
+<meta name="description" content="Try live AI agents built by Loop AI Studio, right in your browser.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg: #e9ebf2;
+    --bg-panel: #ffffff;
+    --ink: #131319;
+    --ink-soft: #4b4b57;
+    --line: #d3d6e0;
+    --accent: #5b3df5;
+    --accent-ink: #ffffff;
+    --accent-soft: #ece8ff;
+    --radius: 14px;
+    --shadow: 0 1px 2px rgba(19,19,25,0.04), 0 8px 24px rgba(19,19,25,0.06);
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin: 0;
+    padding: 0;
+  }
+
+  body{
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap{
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  a{ color: inherit; }
+
+  :focus-visible{
+    outline: 2.5px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  /* ---------- Header ---------- */
+
+  header.hero{
+    padding: 56px 0 40px;
+    position: relative;
+  }
+
+  .kicker{
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+
+  .kicker .dot{
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference){
+    .kicker .dot{
+      animation: pulse 2.2s ease-in-out infinite;
+    }
+  }
+
+  @keyframes pulse{
+    0%, 100%{ opacity: 1; transform: scale(1); }
+    50%{ opacity: 0.45; transform: scale(0.8); }
+  }
+
+  .hero-grid{
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 32px;
+    align-items: start;
+  }
+
+  h1{
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: clamp(30px, 5vw, 46px);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    margin: 0 0 16px;
+  }
+
+  h1 .accent-word{
+    color: var(--accent);
+  }
+
+  .intro{
+    font-size: 16px;
+    color: var(--ink-soft);
+    max-width: 46ch;
+    margin: 0;
+  }
+
+  .loop-mark{
+    width: 128px;
+    height: 128px;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 640px){
+    .loop-mark{ display: none; }
+    .hero-grid{ grid-template-columns: 1fr; }
+  }
+
+  .loop-mark path{
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+
+  .loop-mark .loop-track{
+    stroke: var(--line);
+  }
+
+  @media (prefers-reduced-motion: no-preference){
+    .loop-mark .loop-draw{
+      stroke-dasharray: 340;
+      stroke-dashoffset: 0;
+      animation: loop-travel 5s linear infinite;
+    }
+  }
+
+  @keyframes loop-travel{
+    0%{ stroke-dashoffset: 0; }
+    100%{ stroke-dashoffset: -680; }
+  }
+
+  /* ---------- Agent cards ---------- */
+
+  section.agents{
+    padding: 8px 0 36px;
+  }
+
+  .agent-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  @media (max-width: 780px){
+    .agent-grid{ grid-template-columns: 1fr; }
+  }
+
+  .agent-card{
+    background: var(--bg-panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: var(--shadow);
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .agent-card{ transition: none; }
+  }
+
+  .agent-card.is-active{
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft), var(--shadow);
+  }
+
+  .agent-top{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .agent-name{
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 19px;
+    margin: 0;
+  }
+
+  .agent-tag{
+    font-family: 'Space Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 4px 9px;
+    border-radius: 100px;
+    white-space: nowrap;
+  }
+
+  .agent-blurb{
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin: 0;
+    flex-grow: 1;
+  }
+
+  .launch-btn{
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    background: var(--ink);
+    color: #fff;
+    border: none;
+    border-radius: 9px;
+    padding: 11px 16px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.15s ease;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .launch-btn{ transition: none; }
+  }
+
+  .launch-btn:hover{
+    background: var(--accent);
+  }
+
+  .launch-btn:disabled{
+    background: var(--line);
+    color: var(--ink-soft);
+    cursor: not-allowed;
+  }
+
+  .agent-card.is-active .launch-btn{
+    background: var(--accent);
+  }
+
+  /* ---------- Chat panel ---------- */
+
+  section.chat-section{
+    padding-bottom: 64px;
+  }
+
+  .status-line{
+    font-family: 'Space Mono', monospace;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 18px;
+  }
+
+  .status-line .status-dot{
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--line);
+    flex-shrink: 0;
+  }
+
+  .status-line.is-live .status-dot{
+    background: #22c55e;
+  }
+
+  .chat-panel{
+    background: var(--bg-panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    height: 520px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .chat-empty, .chat-note{
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px;
+  }
+
+  .chat-empty p, .chat-note p{
+    color: var(--ink-soft);
+    font-size: 15px;
+    max-width: 34ch;
+    margin: 0;
+  }
+
+  .chat-note p{
+    color: var(--ink);
+  }
+
+  .chat-note .note-inner{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .chat-note code{
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 3px 8px;
+    border-radius: 6px;
+  }
+
+  /* ---------- Footer ---------- */
+
+  footer{
+    padding: 28px 0 48px;
+    border-top: 1px solid var(--line);
+    font-family: 'Space Mono', monospace;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="kicker"><span class="dot" aria-hidden="true"></span>Loop AI Studio — Live Agents</div>
+    <div class="hero-grid">
+      <div>
+        <h1>Talk to the agents<br>before you hire the <span class="accent-word">studio</span>.</h1>
+        <p class="intro">These are real, working chatbots built for client projects — not screenshots or scripted demos. Pick one below and have an actual conversation with it.</p>
+      </div>
+      <svg class="loop-mark" viewBox="0 0 120 120" aria-hidden="true">
+        <path class="loop-track" d="M60 20a25 25 0 1 1 -17.7 42.7A40 40 0 1 0 60 100a40 40 0 0 0 28.3 -68.3A25 25 0 0 1 60 20Z"/>
+        <path class="loop-draw" d="M60 20a25 25 0 1 1 -17.7 42.7A40 40 0 1 0 60 100a40 40 0 0 0 28.3 -68.3A25 25 0 0 1 60 20Z"/>
+      </svg>
+    </div>
+  </header>
+
+  <section class="agents" aria-label="Available agents">
+    <div class="agent-grid" id="agentGrid"></div>
+  </section>
+
+  <section class="chat-section" aria-label="Chat with selected agent">
+    <div class="status-line" id="statusLine">
+      <span class="status-dot" aria-hidden="true"></span>
+      <span id="statusText">No agent loaded</span>
+    </div>
+    <div class="chat-panel" id="chatPanel">
+      <div class="chat-empty" id="chatEmpty">
+        <p>Pick an agent above to start the conversation.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>Built by Fred · Loop AI Studio.</footer>
+
+</div>
+
+<script>
+  // ---------------------------------------------------------------
+  // AGENT CONFIG — edit this array to change which bots appear.
+  // Replace each projectID with the real Voiceflow Project ID.
+  // Until you do, the panel will show a placeholder note instead
+  // of trying to load the bot.
+  // ---------------------------------------------------------------
+  const AGENTS = [
+    { type: 'voiceflow', projectID: '6a3d52adecef10a29ab99516', name: 'Lead Qualifier', tag: 'Sales', blurb: 'Answers questions from new enquiries and captures their details.' },
+    { type: 'voiceflow', projectID: '6a5a723194d427926f51d9d5', name: 'Marketing Feedback Assistant', tag: 'Marketing', blurb: 'Reviews a landing page and gives quick, constructive feedback on what to improve.' },
+    { type: 'iframe', url: 'https://tiana-chat.vercel.app/', name: 'Experience Chatbot', tag: 'Experience', blurb: 'A custom-built chat experience — try the full end-to-end flow live.' },
+  ];
+
+  const VOICEFLOW_BUNDLE_URL = 'https://cdn.voiceflow.com/widget-next/bundle.mjs';
+
+  const agentGrid   = document.getElementById('agentGrid');
+  const chatPanel   = document.getElementById('chatPanel');
+  const statusLine  = document.getElementById('statusLine');
+  const statusText  = document.getElementById('statusText');
+
+  let bundlePromise = null;
+  let activeIndex = null;
+  let switchToken = 0; // guards against overlapping switches
+
+  function isPlaceholder(agent){
+    const value = agent.type === 'iframe' ? agent.url : agent.projectID;
+    return !value || value.indexOf('PASTE') === 0;
+  }
+
+  function loadVoiceflowBundle(){
+    if (bundlePromise) return bundlePromise;
+    bundlePromise = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.type = 'module';
+      script.src = VOICEFLOW_BUNDLE_URL;
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error('Failed to load Voiceflow bundle'));
+      document.head.appendChild(script);
+    });
+    return bundlePromise;
+  }
+
+  function renderEmptyPanel(){
+    chatPanel.innerHTML = '<div class="chat-empty"><p>Pick an agent above to start the conversation.</p></div>';
+  }
+
+  function renderPlaceholderNote(agent){
+    const label = agent.type === 'iframe' ? 'embed URL' : 'Voiceflow Project ID';
+    chatPanel.innerHTML =
+      '<div class="chat-note"><div class="note-inner"><p>Add this agent’s ' + label + ' in the config to go live.</p>' +
+      '<code>' + agent.name + '</code></div></div>';
+  }
+
+  function setStatus(text, isLive){
+    statusText.textContent = text;
+    statusLine.classList.toggle('is-live', !!isLive);
+  }
+
+  function setActiveCard(index){
+    const cards = agentGrid.querySelectorAll('.agent-card');
+    cards.forEach((card, i) => card.classList.toggle('is-active', i === index));
+  }
+
+  async function launchAgent(agent, index){
+    const token = ++switchToken;
+    activeIndex = index;
+    setActiveCard(index);
+
+    if (isPlaceholder(agent)){
+      setStatus(agent.name + ' — not configured yet', false);
+      renderPlaceholderNote(agent);
+      return;
+    }
+
+    setStatus('Loading ' + agent.name + '…', false);
+    renderEmptyPanel();
+    chatPanel.innerHTML = '<div class="chat-empty"><p>Connecting to ' + agent.name + '…</p></div>';
+
+    // A previously-loaded Voiceflow widget must be torn down regardless of
+    // which agent type is being launched next (Voiceflow allows only one
+    // live instance at a time).
+    if (window.voiceflow && window.voiceflow.chat && window.voiceflow.chat.destroy){
+      try{ window.voiceflow.chat.destroy(); }catch(e){}
+    }
+
+    if (agent.type === 'iframe'){
+      setTimeout(() => {
+        if (token !== switchToken) return;
+        chatPanel.innerHTML = '';
+        const iframe = document.createElement('iframe');
+        iframe.src = agent.url;
+        iframe.title = agent.name;
+        iframe.style.cssText = 'width:100%; height:100%; border:0; display:block;';
+        chatPanel.appendChild(iframe);
+        setStatus(agent.name + ' is live', true);
+      }, 60);
+      return;
+    }
+
+    try{
+      await loadVoiceflowBundle();
+    }catch(err){
+      if (token !== switchToken) return;
+      setStatus('Could not load the chat widget', false);
+      chatPanel.innerHTML = '<div class="chat-empty"><p>Something went wrong loading this agent. Please refresh and try again.</p></div>';
+      return;
+    }
+
+    if (token !== switchToken) return; // a newer launch superseded this one
+
+    setTimeout(() => {
+      if (token !== switchToken) return;
+      chatPanel.innerHTML = '';
+      window.voiceflow.chat.load({
+        verify: { projectID: agent.projectID },
+        url: 'https://general-runtime.voiceflow.com',
+        versionID: 'production',
+        render: { mode: 'embedded', target: chatPanel },
+        autostart: true
+      });
+      setStatus(agent.name + ' is live', true);
+    }, 60);
+  }
+
+  function buildCards(){
+    AGENTS.forEach((agent, index) => {
+      const card = document.createElement('article');
+      card.className = 'agent-card';
+
+      card.innerHTML =
+        '<div class="agent-top">' +
+          '<h2 class="agent-name"></h2>' +
+          '<span class="agent-tag"></span>' +
+        '</div>' +
+        '<p class="agent-blurb"></p>' +
+        '<button type="button" class="launch-btn">Launch</button>';
+
+      card.querySelector('.agent-name').textContent = agent.name;
+      card.querySelector('.agent-tag').textContent = agent.tag;
+      card.querySelector('.agent-blurb').textContent = agent.blurb;
+
+      const btn = card.querySelector('.launch-btn');
+      btn.addEventListener('click', () => launchAgent(agent, index));
+
+      agentGrid.appendChild(card);
+    });
+  }
+
+  buildCards();
+</script>
+
+<!-- Voiceflow floating widget — Marketing Feedback Assistant -->
+<script type="text/javascript">
+  (function(d, t) {
+      var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
+      v.onload = function() {
+        window.voiceflow.chat.load({
+          verify: { projectID: '6a5a723194d427926f51d9d5' },
+          url: 'https://general-runtime.voiceflow.com',
+          voice: {
+            url: "https://runtime-api.voiceflow.com"
+          }
+        });
+      }
+      v.src = "https://cdn.voiceflow.com/widget-next/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
+  })(document, 'script');
+</script>
+
+<!-- Voiceflow floating widget — Lead Qualifier -->
+<script type="text/javascript">
+  (function(d, t) {
+      var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
+      v.onload = function() {
+        window.voiceflow.chat.load({
+          verify: { projectID: '6a3d52adecef10a29ab99516' },
+          url: 'https://general-runtime.voiceflow.com',
+          voice: {
+            url: "https://runtime-api.voiceflow.com"
+          }
+        });
+      }
+      v.src = "https://cdn.voiceflow.com/widget-next/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
+  })(document, 'script');
+</script>
+
+</body>
+</html>
