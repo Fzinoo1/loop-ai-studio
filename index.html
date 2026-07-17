@@ -496,12 +496,20 @@
 
     setTimeout(() => {
       if (token !== switchToken) return;
+      // Voiceflow's SDK appears to retain state tied to the target DOM node
+      // itself across a destroy()/load() cycle, so reusing #chatPanel as the
+      // target directly causes the second agent to fail to mount. Giving each
+      // launch a brand-new, never-before-used child node sidesteps that.
       chatPanel.innerHTML = '';
+      const mountNode = document.createElement('div');
+      mountNode.style.cssText = 'width:100%; height:100%;';
+      chatPanel.appendChild(mountNode);
+
       window.voiceflow.chat.load({
         verify: { projectID: agent.projectID },
         url: 'https://general-runtime.voiceflow.com',
         voice: { url: 'https://runtime-api.voiceflow.com' },
-        render: { mode: 'embedded', target: chatPanel }
+        render: { mode: 'embedded', target: mountNode }
       });
       setStatus(agent.name + ' is live', true);
     }, 60);
